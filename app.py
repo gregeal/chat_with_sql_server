@@ -311,7 +311,10 @@ def ask_database(question, show_details=False):
 
         # Edge Case 3: Check for error results
         if "No results found" in str(raw_result):
-            return f"### 💬 Answer\n\nNo data found matching your criteria.\n\n{('### 🔍 Generated SQL Query\n```sql\n' + sql_query.strip() + '\n```') if show_details else ''}"
+            details = ""
+            if show_details:
+                details = f"### 🔍 Generated SQL Query\n```sql\n{sql_query.strip()}\n```"
+            return f"### 💬 Answer\n\nNo data found matching your criteria.\n\n{details}"
 
         # Stage 5: Generate natural language answer
         answer = (

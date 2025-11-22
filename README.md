@@ -86,6 +86,18 @@ python app.py
 
 The app will automatically open in your browser at: http://127.0.0.1:7860
 
+## Running Tests
+
+Install dependencies with `uv sync` (or `pip install -r requirements.txt`), then run:
+
+```bash
+uv run pytest
+# or
+pytest
+```
+
+The test suite uses lightweight fakes for the database and LLM so it runs without real network or database connections.
+
 ## Usage
 
 1. **Enter your question** in plain English
