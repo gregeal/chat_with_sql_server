@@ -7,9 +7,47 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
 from urllib.parse import quote_plus
 
+def load_config(config_path: str = "config.ini"):
+    """Load configuration from file with environment variable fallbacks."""
+
+    config_parser = configparser.ConfigParser()
+    config_parser.read(config_path)
+
+    required_keys = ["SERVER", "DATABASE", "DRIVER"]
+    db_settings = {}
+    missing_keys = []
+
+    for key in required_keys:
+        value = None
+        if config_parser.has_section("DATABASE"):
+            value = config_parser["DATABASE"].get(key)
+
+        env_value = os.getenv(key)
+        if env_value:
+            value = env_value
+
+        if value:
+            db_settings[key] = value
+        else:
+            missing_keys.append(key)
+
+    if missing_keys:
+        missing_list = ", ".join(missing_keys)
+        error_message = (
+            "Missing required database settings: "
+            f"{missing_list}. Define them in the [DATABASE] section "
+            "of config.ini or set them as environment variables."
+        )
+        raise ValueError(error_message)
+
+    return config_parser, db_settings
+
+
 # Read configuration from .ini file
-config = configparser.ConfigParser()
-config.read('config.ini')
+try:
+    config, db_config = load_config()
+except ValueError as exc:
+    raise SystemExit(f"[ERROR] {exc}")
 
 # Get the API key from the .ini file
 try:
@@ -19,10 +57,10 @@ try:
 except KeyError:
     print("[WARNING] OPENAI_API_KEY not found in config.ini")
 
-# Read database configuration from .ini file
-server = config['DATABASE']['SERVER']
-database = config['DATABASE']['DATABASE']
-driver = config['DATABASE']['DRIVER']
+# Read database configuration from .ini file or environment
+server = db_config["SERVER"]
+database = db_config["DATABASE"]
+driver = db_config["DRIVER"]
 
 # Connect to SQL Server
 connection_string = f'DRIVER={{{driver}}};SERVER={server};DATABASE={database};Trusted_Connection=yes'
