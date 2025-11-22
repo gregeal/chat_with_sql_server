@@ -246,10 +246,11 @@ If your database uses different naming conventions, update:
 
 ## Security Considerations
 
-- ✅ **SQL injection protection**: Uses parameterized queries via SQLAlchemy
+- ⚠️ **Queries are plain text**: The LLM generates full SQL strings that are executed directly—no parameter binding or sanitization is performed.
 - ✅ **API key storage**: Stored in local `config.ini` (add to .gitignore)
 - ✅ **Read-only recommended**: Consider using a read-only database user
 - ✅ **No direct user SQL**: All queries are AI-generated from natural language
+- 🔒 **Hardening (recommended)**: Enforce table/column allowlists, add parameter binding where possible, and restrict the database user to least-privilege access.
 
 ## Performance
 
